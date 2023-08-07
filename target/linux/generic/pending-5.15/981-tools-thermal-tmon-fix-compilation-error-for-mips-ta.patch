@@ -1,0 +1,47 @@
+From cefbbc2d6fb343c0abc89c23b2e44b9243af8915 Mon Sep 17 00:00:00 2001
+From: Florian Eckert <fe@dev.tdt.de>
+Date: Mon, 30 Oct 2023 16:15:40 +0100
+Subject: [PATCH] tools/thermal/tmon: fix compilation error for mips
+ targets
+
+On MIPS targets the following error is emitted during compilation.
+
+tui.o: in function `close_windows.part.0':
+tui.c:(.text+0x124): unsupported jump between ISA modes; consider recompiling with interlinking enabled
+tui.o: in function `setup_windows.part.0':
+tui.c:(.text+0x3ec): unsupported jump between ISA modes; consider recompiling with interlinking enabled
+tui.o: in function `write_status_bar':
+tui.c:(.text+0x580): unsupported jump between ISA modes; consider recompiling with interlinking enabled
+tui.o: in function `show_cooling_device':
+tui.c:(.text+0x928): unsupported jump between ISA modes; consider recompiling with interlinking enabled
+tui.o: in function `show_dialogue':
+tui.c:(.text+0xb90): unsupported jump between ISA modes; consider recompiling with interlinking enabled
+tui.o: in function `initialize_curses':
+tui.c:(.text+0xec4): unsupported jump between ISA modes; consider recompiling with interlinking enabled
+tui.o: in function `show_title_bar':
+tui.c:(.text+0x12dc): unsupported jump between ISA modes; consider recompiling with interlinking enabled
+tui.o: in function `show_data_w':
+tui.c:(.text+0x16a4): unsupported jump between ISA modes; consider recompiling with interlinking enabled
+
+By updating the CFLAGS fixes the compilation.
+
+Signed-off-by: Florian Eckert <fe@dev.tdt.de>
+---
+ tools/thermal/tmon/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/thermal/tmon/Makefile b/tools/thermal/tmon/Makefile
+index f9c52b7fab7b..ae47ad3fb745 100644
+--- a/tools/thermal/tmon/Makefile
++++ b/tools/thermal/tmon/Makefile
+@@ -6,7 +6,7 @@ VERSION = 1.0
+ 
+ BINDIR=usr/bin
+ WARNFLAGS=-Wall -Wshadow -W -Wformat -Wimplicit-function-declaration -Wimplicit-int
+-override CFLAGS+= $(call cc-option,-O3,-O1) ${WARNFLAGS}
++override CFLAGS+= -O1 ${WARNFLAGS}
+ # Add "-fstack-protector" only if toolchain supports it.
+ override CFLAGS+= $(call cc-option,-fstack-protector-strong)
+ CC?= $(CROSS_COMPILE)gcc
+-- 
+
